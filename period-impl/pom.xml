@@ -32,6 +32,12 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version> <!-- Lombok 버전은 프로젝트에 맞게 변경해야 합니다. -->
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

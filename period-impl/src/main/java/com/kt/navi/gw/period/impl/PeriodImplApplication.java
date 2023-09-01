@@ -12,5 +12,7 @@ public class PeriodImplApplication {
 
         PeriodWebClient pwc = new PeriodWebClient();
         System.out.println(pwc.getResult());
+        pwc.fetchEmergencyById();
+        pwc.createEmergency();
     }
 }
