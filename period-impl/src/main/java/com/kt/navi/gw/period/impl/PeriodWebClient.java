@@ -10,4 +10,8 @@ public class PeriodWebClient {
     private WebClient client = WebClient.create("http://localhost:8080");
 
     private Mono<ClientResponse> result = client.get().uri("/service/period/logs").accept(MediaType.TEXT_PLAIN).exchange();
+
+    public String getResult() {
+        return ">> result = " + result.flatMap(res -> res.bodyToMono(String.class)).block();
+    }
 }

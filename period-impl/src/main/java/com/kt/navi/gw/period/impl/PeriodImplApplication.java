@@ -10,6 +10,7 @@ public class PeriodImplApplication {
 
         SpringApplication.run(PeriodImplApplication.class, args);
 
-//        PeriodWebClient pwc = new PeriodWebClient();
+        PeriodWebClient pwc = new PeriodWebClient();
+        System.out.println(pwc.getResult());
     }
 }
