@@ -15,6 +15,14 @@ public class PeriodHandler {
     @Autowired
     private PeriodService periodService;
 
+    public Mono<ServerResponse> unifiedLog(ServerRequest request) {
+        return request.bodyToMono(LogMessage.class)
+                .flatMap(logMessage -> Mono.just(periodService.unifiedLog(logMessage)))
+                .flatMap(logMessage -> ServerResponse.created(URI.create("/unifiedLog/" + logMessage.getTimestamp()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(logMessage)));
+    }
+
 //    public Mono<ServerResponse> unifiedLog(ServerRequest request) {
 //        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
 //                .body(BodyInserters.fromValue("i will give you unifiedLog"));
@@ -32,13 +40,5 @@ public class PeriodHandler {
                 .flatMap(emergency -> ServerResponse.created(URI.create("/emergencies/" + emergency.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromValue(emergency)));
-    }
-
-    public Mono<ServerResponse> unifiedLog(ServerRequest request) {
-        return request.bodyToMono(LogMessage.class)
-                .flatMap(logMessage -> Mono.just(periodService.unifiedLog(logMessage)))
-                .flatMap(logMessage -> ServerResponse.created(URI.create("/unifiedLog/" + logMessage.getTimestamp()))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(logMessage)));
     }
 }
