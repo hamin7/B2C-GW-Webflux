@@ -7,6 +7,7 @@ public class Emergency {
 
     private int id;
     private String name;
+
     public Emergency() {}
     public Emergency(String name) {
         this.name = name;
