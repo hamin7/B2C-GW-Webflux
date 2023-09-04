@@ -1,14 +1,20 @@
 package com.kt.navi.gw.period.impl;
 
+import jdk.javadoc.doclet.Doclet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.config.ConfigData;
+import org.springframework.boot.env.ConfigTreePropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import javax.swing.text.html.Option;
 import java.net.URI;
+import java.security.cert.PKIXRevocationChecker;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +22,8 @@ import java.util.Optional;
 public class PeriodHandler {
     @Autowired
     private PeriodService periodService;
+    private GroupService groupService;
+    private WebClient webClient = WebClient.create("http://localhost:8080");
 
     // TODO : logMessage의 쓸모는?
     public Mono<List<Emergency>> getEmergencies(LogMessage logMessage, Location location) {
@@ -59,18 +67,32 @@ public class PeriodHandler {
 
                     Mono<List<Emergency>> emergenciesMono = getEmergencies(logMessage, location);
                     Mono<List<Sudden>> suddenMono = getSuddens(logMessage, location);
-                    Mono<CommunicationResponseMessage> communicationResponseMessageMono = processCommunicationRequest(logMessage, communicationRequestMessage);
+                    Mono<Optional<CommunicationResponseMessage>> communicationResponseMessageMono = processCommunicationRequest(logMessage, communicationRequestMessage);
                 });
     }
 
-    public Mono<CommunicationResponseMessage> processCommunicationRequest(LogMessage logMessage, CommunicationRequestMessage communicationRequestMessage) {
+    public Mono<Optional<CommunicationResponseMessage>> processCommunicationRequest(LogMessage logMessage, CommunicationRequestMessage communicationRequestMessage) {
         if (communicationRequestMessage != null) {
             Location location = logMessage.getLocation();
             if (location != null) {
-
-            } else {
-
+                communicationRequestMessage = communicationRequestMessage.locationAddedIfNotExists(location.getLat(), location.getLng());
             }
+            communicationRequestMessage = communicationRequestMessage.added(logMessage.instanceId, logMessage.instanceId);      // added(context.instanceId, context.transactionId)
+
+            // 외부 서비스를 호출하여 비동기적으로 communicationRequestMessage를 처리, 결과를 반환.
+            return webClient.post()
+                    .uri("/processCommunicationRequest")
+                    .body(BodyInserters.fromValue(communicationRequestMessage))
+                    .retrieve()
+                    .bodyToMono(CommunicationResponseMessage.class)
+                    .map(response -> {
+                        if (response != null && response.getGroupMessage() != null) {
+                            return Optional.of(response);
+                        }
+                        return Optional.empty();
+                    });
+        } else {
+            return Mono.just(Optional.empty());
         }
     }
 
