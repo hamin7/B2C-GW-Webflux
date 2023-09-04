@@ -9,7 +9,7 @@ public class LogMessage {
     public Location location;
 
     public Data data;
-    public Communication communication;
+    public CommunicationRequestMessage communication;
 
     public LogMessage() {}
     public LogMessage(double timestamp, String instanceId, Location location) {

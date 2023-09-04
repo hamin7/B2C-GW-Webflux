@@ -9,11 +9,70 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class PeriodHandler {
     @Autowired
     private PeriodService periodService;
+
+    // TODO : logMessage의 쓸모는?
+    public Mono<List<Emergency>> getEmergencies(LogMessage logMessage, Location location) {
+        if (location != null) {
+            return Mono.fromCallable(() -> {
+                List<Emergency> list = fetchEmergencyData(location);
+                return list;
+            });
+        } else {
+            return Mono.empty();
+        }
+    }
+
+    public List<Emergency> fetchEmergencyData(Location location) {
+        // 비동기 작업을 수행하여 List<Emergency> 데이터를 가져옴
+        return List.of(new Emergency(0, "crash"), new Emergency(1, "Fire"));
+    }
+
+    public Mono<List<Sudden>> getSuddens(LogMessage logMessage, Location location) {
+        if (location != null) {
+            return Mono.fromCallable(() -> {
+                List<Sudden> list = fetchSuddenData(location);
+                return list;
+            });
+        } else {
+            return Mono.empty();
+        }
+    }
+
+    public List<Sudden> fetchSuddenData(Location location) {
+        return List.of(new Sudden("0", "seoul", 37.47135, 127.02937));
+    }
+
+    public Mono<ServerResponse> authenticate(ServerRequest request) {
+        String requestHeader = request.headers().firstHeader("requestHeader");
+
+        return request.bodyToMono(LogMessage.class)
+                .flatMap(logMessage -> {
+                    Location location = logMessage.getLocation();
+                    CommunicationRequestMessage communicationRequestMessage = logMessage.getCommunication();
+
+                    Mono<List<Emergency>> emergenciesMono = getEmergencies(logMessage, location);
+                    Mono<List<Sudden>> suddenMono = getSuddens(logMessage, location);
+                    Mono<CommunicationResponseMessage> communicationResponseMessageMono = processCommunicationRequest(logMessage, communicationRequestMessage);
+                });
+    }
+
+    public Mono<CommunicationResponseMessage> processCommunicationRequest(LogMessage logMessage, CommunicationRequestMessage communicationRequestMessage) {
+        if (communicationRequestMessage != null) {
+            Location location = logMessage.getLocation();
+            if (location != null) {
+
+            } else {
+
+            }
+        }
+    }
 
     public Mono<ServerResponse> unifiedLog(ServerRequest request) {
         return request.bodyToMono(LogMessage.class)
