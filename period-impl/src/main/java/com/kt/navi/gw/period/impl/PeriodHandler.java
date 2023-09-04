@@ -23,11 +23,6 @@ public class PeriodHandler {
                         .body(BodyInserters.fromValue(logMessage)));
     }
 
-//    public Mono<ServerResponse> unifiedLog(ServerRequest request) {
-//        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
-//                .body(BodyInserters.fromValue("i will give you unifiedLog"));
-//    }
-
     public Mono<ServerResponse> getEmergencyById(ServerRequest request) {
         int id = Integer.parseInt(request.pathVariable("id"));
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
