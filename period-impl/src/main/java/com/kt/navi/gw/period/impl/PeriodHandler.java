@@ -1,9 +1,8 @@
 package com.kt.navi.gw.period.impl;
 
-import jdk.javadoc.doclet.Doclet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.config.ConfigData;
-import org.springframework.boot.env.ConfigTreePropertySource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -12,9 +11,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import javax.swing.text.html.Option;
 import java.net.URI;
-import java.security.cert.PKIXRevocationChecker;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,8 +63,23 @@ public class PeriodHandler {
                     CommunicationRequestMessage communicationRequestMessage = logMessage.getCommunication();
 
                     Mono<List<Emergency>> emergenciesMono = getEmergencies(logMessage, location);
-                    Mono<List<Sudden>> suddenMono = getSuddens(logMessage, location);
-                    Mono<Optional<CommunicationResponseMessage>> communicationResponseMessageMono = processCommunicationRequest(logMessage, communicationRequestMessage);
+                    Mono<List<Sudden>> suddensMono = getSuddens(logMessage, location);
+                    Mono<Optional<CommunicationResponseMessage>> communicationResponseMono = processCommunicationRequest(logMessage, communicationRequestMessage);
+
+                    return Mono.zip(emergenciesMono, suddensMono, communicationResponseMono)
+                            .flatMap(tuple -> {
+                                List<Emergency> emergencies = tuple.getT1();
+                                List<Sudden> suddens = tuple.getT2();
+                                Optional<CommunicationResponseMessage> communicationResponseMessage = tuple.getT3();
+
+                                HttpHeaders headers = new HttpHeaders();
+                                headers.setContentType(MediaType.APPLICATION_JSON);
+                                PeriodMessage periodMessage = new PeriodMessage(emergencies, suddens, communicationResponseMessage);
+
+                                return ServerResponse.status(HttpStatus.OK)
+                                        .headers(httpHeaders -> httpHeaders.putAll(headers))
+                                        .bodyValue(periodMessage);
+                            });
                 });
     }
 
