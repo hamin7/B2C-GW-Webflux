@@ -15,21 +15,21 @@ public class PeriodWebClient {
         return ">> result = " + result.flatMap(res -> res.bodyToMono(String.class)).block();
     }
 
-    public void fetchEmergencyById() {
-        int id = 101;
-        client.get()
-                .uri("/emergencies/" + id)
-                .exchange()
-                .flatMap(res -> res.bodyToMono(String.class))
-                .subscribe(emergency -> System.out.println("GET: " + emergency));
-    }
-
-    public void createEmergency() {
-        client.post()
-                .uri("/create")
-                .bodyValue(new Emergency("Crash"))
-                .exchange()
-                .flatMap(res -> res.bodyToMono(Emergency.class))
-                .subscribe(emergency -> System.out.println("POST: " + emergency.getId()));
-    }
+//    public void fetchEmergencyById() {
+//        int id = 101;
+//        client.get()
+//                .uri("/emergencies/" + id)
+//                .exchange()
+//                .flatMap(res -> res.bodyToMono(String.class))
+//                .subscribe(emergency -> System.out.println("GET: " + emergency));
+//    }
+//
+//    public void createEmergency() {
+//        client.post()
+//                .uri("/create")
+//                .bodyValue(new Emergency("Crash"))
+//                .exchange()
+//                .flatMap(res -> res.bodyToMono(Emergency.class))
+//                .subscribe(emergency -> System.out.println("POST: " + emergency.getId()));
+//    }
 }

@@ -83,8 +83,7 @@ public class PeriodHandler {
     }
 
     public Optional<List<Emergency>> fetchEmergencyData(Location location) {
-        // 비동기 작업을 수행하여 List<Emergency> 데이터를 가져옴
-        return Optional.of(List.of(new Emergency(0, "crash"), new Emergency(1, "Fire")));
+        return Optional.of(List.of(new Emergency("1841", 37.47135, 127.02937, 20230905), new Emergency("7406", 35.44215, 131.42156, 20230905)));
     }
 
     public Mono<Optional<List<Sudden>>> getSuddens(LogMessage logMessage, Location location) {
