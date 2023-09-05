@@ -18,7 +18,7 @@ public class PeriodHandler {
 
     private WebClient webClient = WebClient.create("http://localhost:8080");
 
-    public Mono<ServerResponse> authenticate(ServerRequest request) {
+    public Mono<ServerResponse> unifiedLog(ServerRequest request) {
 
         return request.bodyToMono(LogMessage.class)
                 .flatMap(logMessage -> {
