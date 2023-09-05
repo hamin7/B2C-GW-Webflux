@@ -25,14 +25,14 @@ public class PeriodHandler {
                     Location location = logMessage.getLocation();
                     CommunicationRequestMessage communicationRequestMessage = logMessage.getCommunication();
 
-                    Mono<List<Emergency>> emergenciesMono = getEmergencies(logMessage, location);
-                    Mono<List<Sudden>> suddensMono = getSuddens(logMessage, location);
+                    Mono<Optional<List<Emergency>>> emergenciesMono = getEmergencies(logMessage, location);
+                    Mono<Optional<List<Sudden>>> suddensMono = getSuddens(logMessage, location);
                     Mono<Optional<CommunicationResponseMessage>> communicationResponseMono = processCommunicationRequest(logMessage, communicationRequestMessage);
 
                     return Mono.zip(emergenciesMono, suddensMono, communicationResponseMono)
                             .flatMap(tuple -> {
-                                List<Emergency> emergencies = tuple.getT1();
-                                List<Sudden> suddens = tuple.getT2();
+                                Optional<List<Emergency>> emergencies = tuple.getT1();
+                                Optional<List<Sudden>> suddens = tuple.getT2();
                                 Optional<CommunicationResponseMessage> communicationResponseMessage = tuple.getT3();
 
                                 HttpHeaders headers = new HttpHeaders();
@@ -72,34 +72,32 @@ public class PeriodHandler {
     }
 
     // TODO : logMessage의 쓸모는?
-    public Mono<List<Emergency>> getEmergencies(LogMessage logMessage, Location location) {
+    public Mono<Optional<List<Emergency>>> getEmergencies(LogMessage logMessage, Location location) {
         if (location != null) {
             return Mono.fromCallable(() -> {
-                List<Emergency> list = fetchEmergencyData(location);
-                return list;
+                return fetchEmergencyData(location);
             });
         } else {
             return Mono.empty();
         }
     }
 
-    public List<Emergency> fetchEmergencyData(Location location) {
+    public Optional<List<Emergency>> fetchEmergencyData(Location location) {
         // 비동기 작업을 수행하여 List<Emergency> 데이터를 가져옴
-        return List.of(new Emergency(0, "crash"), new Emergency(1, "Fire"));
+        return Optional.of(List.of(new Emergency(0, "crash"), new Emergency(1, "Fire")));
     }
 
-    public Mono<List<Sudden>> getSuddens(LogMessage logMessage, Location location) {
+    public Mono<Optional<List<Sudden>>> getSuddens(LogMessage logMessage, Location location) {
         if (location != null) {
             return Mono.fromCallable(() -> {
-                List<Sudden> list = fetchSuddenData(location);
-                return list;
+                return fetchSuddenData(location);
             });
         } else {
             return Mono.empty();
         }
     }
 
-    public List<Sudden> fetchSuddenData(Location location) {
-        return List.of(new Sudden("0", "seoul", 37.47135, 127.02937));
+    public Optional<List<Sudden>> fetchSuddenData(Location location) {
+        return Optional.of(List.of(new Sudden("0", "seoul", 37.47135, 127.02937)));
     }
 }
