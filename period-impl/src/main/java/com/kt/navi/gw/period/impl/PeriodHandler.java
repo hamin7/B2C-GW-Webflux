@@ -25,15 +25,14 @@ public class PeriodHandler {
                     Location location = logMessage.getLocation();
                     CommunicationRequestMessage communicationRequestMessage = logMessage.getCommunication();
 
-                    Mono<Optional<List<Emergency>>> emergenciesMono = getEmergencies(logMessage, location);
-                    Mono<Optional<List<Sudden>>> suddensMono = getSuddens(logMessage, location);
-                    Mono<Optional<CommunicationResponseMessage>> communicationResponseMono = processCommunicationRequest(logMessage, communicationRequestMessage);
-
-                    return Mono.zip(emergenciesMono, suddensMono, communicationResponseMono)
+                    return Mono
+                            .zip(getEmergencies(logMessage, location), getSuddens(logMessage, location), processCommunicationRequest(logMessage, communicationRequestMessage))
                             .flatMap(tuple -> {
                                 Optional<List<Emergency>> emergencies = tuple.getT1();
                                 Optional<List<Sudden>> suddens = tuple.getT2();
                                 Optional<CommunicationResponseMessage> communicationResponseMessage = tuple.getT3();
+
+                                // kafka
 
                                 HttpHeaders headers = new HttpHeaders();
                                 headers.setContentType(MediaType.APPLICATION_JSON);

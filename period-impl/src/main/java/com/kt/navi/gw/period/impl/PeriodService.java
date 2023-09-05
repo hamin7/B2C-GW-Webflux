@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class PeriodService {
 
-    public LogMessage unifiedLog(LogMessage logMessage) {
-        System.out.println("unifiedLog => timestamp : " + logMessage.timestamp + ", instanceId : " + logMessage.instanceId + ", Location : (" + logMessage.location.lat + ","+logMessage.location.lng + ")");
-        return new LogMessage(logMessage.getTimestamp(), logMessage.getInstanceId(), logMessage.getLocation());
-    }
+//    public LogMessage unifiedLog(LogMessage logMessage) {
+//        System.out.println("unifiedLog => timestamp : " + logMessage.timestamp + ", instanceId : " + logMessage.instanceId + ", Location : (" + logMessage.location.lat + ","+logMessage.location.lng + ")");
+//        return new LogMessage(logMessage.getTimestamp(), logMessage.getInstanceId(), logMessage.getLocation());
+//    }
 }
