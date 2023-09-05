@@ -13,11 +13,7 @@ public class PeriodRouter {
     @Bean
     public RouterFunction<ServerResponse> root(PeriodHandler periodHandler) {
         return RouterFunctions.route()
-//                .route(RequestPredicates.GET("/service/period/logs").and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), periodHandler::unifiedLog)
                 .POST("/service/period/logs", RequestPredicates.contentType(MediaType.APPLICATION_JSON), periodHandler::authenticate)
-                .POST("/unifiedLog", RequestPredicates.contentType(MediaType.APPLICATION_JSON), periodHandler::unifiedLog)
-                .GET("emergencies/{id}", RequestPredicates.accept(MediaType.TEXT_PLAIN), periodHandler::getEmergencyById)
-                .POST("/create", RequestPredicates.contentType(MediaType.APPLICATION_JSON), periodHandler::createEmergency)
                 .build();
     }
 }

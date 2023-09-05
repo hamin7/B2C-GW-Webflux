@@ -10,10 +10,5 @@ public class PeriodImplApplication {
     public static void main(String[] args) {
 
         SpringApplication.run(PeriodImplApplication.class, args);
-
-//        PeriodWebClient pwc = new PeriodWebClient();
-//        System.out.println(pwc.getResult());
-//        pwc.fetchEmergencyById();
-//        pwc.createEmergency();
     }
 }

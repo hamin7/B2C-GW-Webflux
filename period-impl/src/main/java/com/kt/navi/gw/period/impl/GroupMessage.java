@@ -15,6 +15,7 @@ public class GroupMessage {
         this.myMemberId = myMemberId;
         this.groupTimestamp = groupTimestamp;
     }
+
     public GroupMessage(String groupId, int myMemberId, Long groupTimestamp, GroupState groupState, MemberStatus[] membersStatus) {
         this.groupId = groupId;
         this.myMemberId = myMemberId;
