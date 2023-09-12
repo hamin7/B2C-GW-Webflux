@@ -1,9 +1,11 @@
 package com.kt.navi.gw.period.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -17,6 +19,9 @@ import java.util.Optional;
 public class PeriodHandler {
 
     private WebClient webClient = WebClient.create("http://localhost:8080");
+
+    @Autowired
+    private KafkaProducerService kafkaProducerService;
 
     public Mono<ServerResponse> unifiedLog(ServerRequest request) {
 
@@ -32,11 +37,12 @@ public class PeriodHandler {
                                 Optional<List<Sudden>> suddens = tuple.getT2();
                                 Optional<CommunicationResponseMessage> communicationResponseMessage = tuple.getT3();
 
-                                // kafka
-
                                 HttpHeaders headers = new HttpHeaders();
                                 headers.setContentType(MediaType.APPLICATION_JSON);
                                 PeriodMessage periodMessage = new PeriodMessage(emergencies, suddens, communicationResponseMessage);
+
+                                // kafka
+                                publishMessage(periodMessage.toString());
 
                                 return ServerResponse.status(HttpStatus.OK)
                                         .headers(httpHeaders -> httpHeaders.putAll(headers))
@@ -97,5 +103,10 @@ public class PeriodHandler {
 
     public Optional<List<Sudden>> fetchSuddenData(Location location) {
         return Optional.of(List.of(new Sudden("0", "seoul", 37.47135, 127.02937)));
+    }
+
+    public void publishMessage(@RequestBody String message) {
+        kafkaProducerService.sendMessage(message);
+        System.out.println("kafka produce : " + message);
     }
 }
